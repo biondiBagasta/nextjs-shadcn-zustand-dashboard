@@ -1,6 +1,6 @@
 "use client"
 
-import { User } from "@/app/interfaces/user"
+import { User } from "@/interfaces/user"
 import { Menu } from "lucide-react"
 import { useState } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"

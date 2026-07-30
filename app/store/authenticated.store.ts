@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { User } from "../interfaces/user";
+import { User } from "../../interfaces/user";
 
 interface AuthenticatedState {
   userState: User
