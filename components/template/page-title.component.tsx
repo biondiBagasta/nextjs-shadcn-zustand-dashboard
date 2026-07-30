@@ -1,0 +1,31 @@
+"use client"
+
+import Link from "next/link";
+
+interface PageTitleProps {
+  title: string;
+  subtitle: string;
+}
+
+export default function PageTitleComponent(props: PageTitleProps) {
+  return (
+    <div className="flex flex-column md:flex-row justify-between items.center">
+      <div className="page-title">
+        { props.title }
+      </div>
+      <ul className="breadcrumb">
+        {
+          props.subtitle ? (
+            <li>
+              <Link href={ '/dashboard/main' } style={
+                {
+                  textDecoration: 'none'
+                }
+              }>{ props.subtitle }</Link>
+            </li>
+          ) : (<></>)
+        }
+      </ul>
+    </div>
+  )
+}
