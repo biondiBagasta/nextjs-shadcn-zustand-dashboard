@@ -8,7 +8,13 @@ export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    router.replace("/dashboard/main")
+    const jwt = localStorage.getItem("jwt");
+
+    if(jwt) {
+    router.replace("/dashboard/main");
+    } else {
+    router.replace("/login");
+    }
   })
 
   return <></>

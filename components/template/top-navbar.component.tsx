@@ -19,7 +19,7 @@ export default function TopNavbarComponent(props: TopNavbarProps) {
   const router = useRouter();
 
   const logout = () => {
-		localStorage.removeItem("rust-jwt");
+		localStorage.clear();
 		router.replace("/login");
 	}
 

@@ -1,8 +1,7 @@
 "use client"
 
-import Image from "next/image"
 import SidebarMenuItemComponent from "./sidebar-menu-item.component"
-import { ChartColumn, Tags } from "lucide-react"
+import { ChartColumn, Package, } from "lucide-react"
 
 interface SidebarProps {
   isOpenedSidebar: boolean
@@ -25,8 +24,8 @@ export default function SidebarComponent(props: SidebarProps) {
           <ChartColumn size={24} />
         } />
 
-        <SidebarMenuItemComponent name="Category" redirectRoute="category" icon={
-          <Tags size={24} />
+        <SidebarMenuItemComponent name="Products" redirectRoute="products" icon={
+          <Package size={24} />
         }/>
       </ul>
     </aside>

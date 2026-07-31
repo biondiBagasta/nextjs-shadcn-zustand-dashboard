@@ -1,11 +1,18 @@
 "use client"
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Toast } from "@/components/ui/toast";
+import { toast, Toast } from "@/components/ui/toast";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
+import { catchError, EMPTY, Subscription, switchMap, tap } from "rxjs";
+import { useServiceStore } from "@/store/service.stroe";
+import { useAuthenticatedStore } from "@/store/authenticated.store";
+import { useRouter } from "next/navigation";
+import { AxiosError } from "axios";
+import { showHttpErrorToast } from "@/lib/axios";
+import { Spinner } from "@/components/ui/spinner";
 
 interface LoginForm {
   username: string;
@@ -19,11 +26,100 @@ export default function LoginPage() {
   });
 
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  setLoginForm((prev) => ({
-    ...prev,
-    [e.target.name]: e.target.value,
-  }));
-};
+    setLoginForm((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const [isLoadingSubmit, setIsLoadingSubmit] = useState(false);
+
+  const subscriptionRef = useRef(new Subscription())
+
+  const authService = useServiceStore((state) => state.authService)
+
+  const setAuthenticatedState = useAuthenticatedStore((state) => state.setUserState)
+
+  const router = useRouter();
+
+  useEffect(() => {
+		const jwt = localStorage.getItem("jwt");
+
+		const currentSubscription = subscriptionRef.current;
+
+		if(jwt) {
+			router.replace("/dashboard/main");
+		}
+
+		return () => {
+			currentSubscription.unsubscribe();
+		}
+	}, [router]);
+
+
+  useEffect(() => {
+    return () => {
+      subscriptionRef.current.unsubscribe()
+    }
+  }, [])
+
+  // useEffect(() => {
+  // }, [router])
+
+  const login = () => {
+
+    const username = loginForm.username;
+    const password = loginForm.password;
+
+    if(!username || !password) {
+      if(!username) {
+        toast.add({
+          title: "PERHATIAN",
+          type: "error",
+          description: "Username harus diisi."
+        })
+      }
+
+      if(!password) {
+        toast.add({
+          title: "PERHATIAN",
+          type: "error",
+          description: "Password harus diisi."
+        })
+      }
+    } else {
+      setIsLoadingSubmit(true);
+
+      const loginSubscription = authService.login(loginForm.username, loginForm.password).pipe(
+        switchMap((data) => {
+          
+
+          localStorage.setItem("jwt", data.token)
+
+          return authService.authenticated().pipe(
+            tap(data => {
+              setIsLoadingSubmit(false);
+              setAuthenticatedState(data);
+
+              router.push("/dashboard/main")
+            })
+          )
+        }),
+        catchError((e: AxiosError) => {
+          setIsLoadingSubmit(false);
+
+          setLoginForm({
+            username: "",
+            password: ""
+          })
+          showHttpErrorToast(e);
+          return EMPTY
+        })
+      ).subscribe();
+
+      subscriptionRef.current.add(loginSubscription)
+    }
+  }
 
   return (
     <div className="w-full h-screen flex flex-row items-center justify-center p-4">
@@ -38,7 +134,9 @@ export default function LoginPage() {
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-2">
                 <label htmlFor="username">Username</label>
-                <Input id="username" placeholder="Username" required value={
+                <Input id="username" 
+                name="username"
+                placeholder="Username" required value={
                   loginForm.username
                 } onChange={
                   (e) => handleFormChange(e)
@@ -47,7 +145,9 @@ export default function LoginPage() {
 
               <div className="flex flex-col gap-2">
                 <label htmlFor="password">Password</label>
-                <Input id="password" type="password" placeholder="Password"
+                <Input id="password" 
+                name="password"
+                type="password" placeholder="Password"
                 required value={
                   loginForm.password
                 } onChange={ handleFormChange }></Input>
@@ -56,7 +156,10 @@ export default function LoginPage() {
           </form>
         </CardContent>
         <CardFooter>
-          <Button type="submit" className="w-full h-12">
+          <Button type="submit" className="w-full h-12 cursor-pointer" onClick={ login }>
+            {
+              isLoadingSubmit ? <Spinner data-icon="inline-start"></Spinner> : <></>
+            }
             Login
           </Button>
         </CardFooter>

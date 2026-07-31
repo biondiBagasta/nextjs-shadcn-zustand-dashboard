@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import "./dashboard.css"
+import { Toaster } from "@/components/ui/toast"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -32,7 +33,11 @@ export default function RootLayout({
       lang="en"
       className={inter.className}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        {children}
+
+        <Toaster />
+      </body>
     </html>
   );
 }
