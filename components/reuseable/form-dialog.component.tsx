@@ -31,16 +31,16 @@ export default function FormDialogComponent(props: FormDialogComponentProps) {
         } />
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
-            <DialogTitle>Create Category</DialogTitle>
+            <DialogTitle>{ props.title }</DialogTitle>
           </DialogHeader>
           <FieldGroup>
             { props.form_content }
           </FieldGroup>
           <DialogFooter>
             <DialogClose render={
-              <Button variant="outline">Cancel</Button>
+              <Button variant="outline" className="cursor-pointer">Cancel</Button>
             }/>
-            <Button type="submit" onClick={ props.onSubmit }>
+            <Button type="submit" onClick={ props.onSubmit } className="cursor-pointerN">
               {
                 props.isLoadingSubmit ? <Spinner data-icon="inline-start"></Spinner> : <></>
               }

@@ -36,6 +36,7 @@ export function toObservable<T>(
 }
 
 export function showHttpErrorToast(e: AxiosError): void {
+  console.log(e)
   toast.add({
     type: "error",
     title: "ERROR",

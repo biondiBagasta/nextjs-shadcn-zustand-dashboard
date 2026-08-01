@@ -34,8 +34,8 @@ export function DeleteAlertComponent(props: DeleteAlertComponentProps) {
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={ props.onSubmit }>Continue</AlertDialogAction>
+          <AlertDialogCancel className="cursor-pointer">Cancel</AlertDialogCancel>
+          <AlertDialogAction  className="cursor-pointer" onClick={ props.onSubmit }>Continue</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

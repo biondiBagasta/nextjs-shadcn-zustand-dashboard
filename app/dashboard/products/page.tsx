@@ -5,8 +5,28 @@ import { Button } from "@/components/ui/button"
 import { Card, CardAction, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Plus } from "lucide-react"
 import CategoryComponent from "./categories/category.component"
+import { useQuill } from 'react-quilljs';
+import 'quill/dist/quill.snow.css';
+import { useRef, useState } from "react"
+import { Subscription } from "rxjs"
 
 export default function ProductPage() {
+
+  const [formControl, setFormControl] = useState({
+    code: "",
+    name: "",
+    purchase_price: "",
+    selling_price: "",
+    stock: "",
+    discount: "",
+    category_id: 0,
+  });
+
+  const [imageFileControl, setImageFileControl] = useState<File | null>(null)
+
+  const subscriptionRef = useRef(new Subscription())
+
+
   return (
     <div className="section">
       <PageTitleComponent title="Product" subtitle="Dashboard"></PageTitleComponent>
