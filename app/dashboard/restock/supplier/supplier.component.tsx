@@ -1,46 +1,59 @@
 "use client"
 
-import { CategoryData } from "@/interfaces/category";
+import FormDialogComponent from "@/components/reuseable/form-dialog.component";
+import NoDataAlertComponent from "@/components/reuseable/no-data-alert-component";
+import { Button } from "@/components/ui/button";
+import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { toast } from "@/components/ui/toast";
+import { SupplierData } from "@/interfaces/supplier"
 import { showHttpErrorToast } from "@/lib/axios";
 import { useServiceStore } from "@/store/service.stroe";
 import { AxiosError } from "axios";
+import { Plus, SquarePen, Trash2 } from "lucide-react";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react"
 import { catchError, EMPTY, Subscription, tap } from "rxjs";
-import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, SquarePen, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import InputTextComponent from "@/components/reuseable/input-text-component";
-import { toast } from "@/components/ui/toast";
-import FormDialogComponent from "@/components/reuseable/form-dialog.component";
-import { DeleteAlertComponent } from "@/components/reuseable/delete-alert-component";
+import SupplierForms from "./supplier.forms";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import LoadingTableComponent from "@/components/reuseable/loading-table-component";
-import NoDataAlertComponent from "@/components/reuseable/no-data-alert-component";
+import { Badge } from "@/components/ui/badge";
+import { DeleteAlertComponent } from "@/components/reuseable/delete-alert-component";
 
-interface CategoryComponentProps {
-  setCategoryListDispatch: Dispatch<SetStateAction<CategoryData[]>>
+interface SupplierComponentProps {
+  setSupplierList: Dispatch<SetStateAction<SupplierData[]>>
 }
 
-export default function CategoryComponent(props: CategoryComponentProps) {
+export interface SupplierFormsControl {
+  name: string;
+  address: string;
+  phone_number: string;
+  active: boolean;
+}
 
-  const [nameControl, setNameControl] = useState("")
+export default function SupplierComponent(props: SupplierComponentProps) {
+  const [formControl, setFormControl] = useState<SupplierFormsControl>({
+    name: "",
+    address: "",
+    phone_number: "",
+    active: true
+  });
+
+  const checkFormValidity = () => {
+    const isValid = !Object.values(formControl).some(
+      (value) => value === "" || value === 0
+    );
+
+    return isValid;
+  }
 
   const [isLoadingTable, setIsLoadingTable] = useState(true);
 
-  const [dataList, setDataList] = useState<CategoryData[]>([])
+  const [dataList, setDataList] = useState<SupplierData[]>([])
 
-  const [selectedData, setSelectedData] = useState<CategoryData | null>(null)
+  const [selectedData, setSelectedData] = useState<SupplierData | null>(null)
 
   const subscriptionRef = useRef(new Subscription())
 
-  const categoryService = useServiceStore((state) => state.categoryService)
+  const supplierService = useServiceStore((state) => state.supplierService)
 
   const [isLoadingSubmit, setIsLoadingSubmit] = useState(false)
 
@@ -56,24 +69,21 @@ export default function CategoryComponent(props: CategoryComponentProps) {
     }
   }, [])
 
-  const checkFormValidity = () => {
-    if(nameControl) {
-      return true
-    } else {
-      return false
-    }
-  }
-
   const resetFormControl = () => {
-    setNameControl("")
+    setFormControl({
+      name: "",
+      address: "",
+      phone_number: "",
+      active: true
+    })
   }
 
   const initialize = () => {
     setIsLoadingTable(true);
 
-    const initializeSubscription = categoryService.findMany().pipe(
+    const initializeSubscription = supplierService.findMany().pipe(
       tap(data => {
-        props.setCategoryListDispatch(data);
+        props.setSupplierList(data);
         setDataList(data);
         setIsLoadingTable(false);
       }),
@@ -89,8 +99,13 @@ export default function CategoryComponent(props: CategoryComponentProps) {
     subscriptionRef.current.add(initializeSubscription);
   }
 
-  const updateFormAndSelectedData = (data: CategoryData) => {
-    setNameControl(data.name)
+  const updateFormAndSelectedData = (data: SupplierData) => {
+    setFormControl({
+      name: data.name,
+      address: data.address,
+      phone_number: data.phone_number,
+      active: data.active == 1 ? true : false
+    })
     setSelectedData(data);
   }
 
@@ -106,18 +121,18 @@ export default function CategoryComponent(props: CategoryComponentProps) {
         description: "Form harus dilengkapi terlebih dahulu!!!"
       })
     } else {
-      setIsLoadingSubmit(true);
-      const name = nameControl;
-      const createSubscription = categoryService.create({
-        name
+      setIsLoadingSubmit(true)
+      const createSubscription = supplierService.create({
+        name: formControl.name,
+        address: formControl.address,
+        phone_number: formControl.phone_number,
+        active: formControl.active == true ? 1 : 0
       }).pipe(
         tap(data => {
           setIsLoadingSubmit(false);
           if(data.success) {
             initialize()
             resetFormControl();
-            
-            
             setIsOpenedCreateDialog(false);
 
             toast.add({
@@ -160,18 +175,18 @@ export default function CategoryComponent(props: CategoryComponentProps) {
       })
     } else {
       setIsLoadingSubmit(true);
-      const name = nameControl;
-
-      const updateSubscription = categoryService.update(selectedData!.id, {
-        name
+      const updateSubscription = supplierService.update(selectedData!.id, {
+        name: formControl.name,
+        address: formControl.address,
+        phone_number: formControl.phone_number,
+        active: formControl.active == true ? 1 : 0
       }).pipe(
         tap((data) => {
           setIsLoadingSubmit(false);
           if(data.success) {
             initialize()
             resetFormControl();
-            
-            
+          
             setIsOpenedEditDialog(false);
 
             toast.add({
@@ -204,7 +219,7 @@ export default function CategoryComponent(props: CategoryComponentProps) {
   const deleteData = () => {
     setIsLoadingSubmit(true);
 
-    const deleteSubscription = categoryService.delete(selectedData!.id).pipe(
+    const deleteSubscription = supplierService.delete(selectedData!.id).pipe(
       tap((response) => {
         initialize();
         setIsOpenedDeleteDialog(false);
@@ -227,15 +242,15 @@ export default function CategoryComponent(props: CategoryComponentProps) {
 
     subscriptionRef.current.add(deleteSubscription)
   }
-  
+
   return (
     <>
       <Card>
         <CardHeader>
-          <CardTitle>Data Product Category</CardTitle>
+          <CardTitle>Data Supplier</CardTitle>
           <CardAction>
             <FormDialogComponent isOpen={ isOpenedCreateDialog } setIsOpen={ setIsOpenedCreateDialog }
-            title="Add Category" trigger={
+            title="Add Supplier" trigger={
               <Button variant={'default'} size={'lg'} className="cursor-pointer" onClick={
                 (_) => resetFormControl()
               }>
@@ -243,12 +258,7 @@ export default function CategoryComponent(props: CategoryComponentProps) {
                 Add Data
               </Button>
             } form_content={
-              <>
-                <InputTextComponent nameElement="name" valueControl={ nameControl } onChangeControl={
-                  (val) => setNameControl(val)
-                } label="Name">
-                </InputTextComponent>
-              </>
+              <SupplierForms control={ formControl } setControl={ setFormControl } />
             } isLoadingSubmit={ isLoadingSubmit } onSubmit={ createData } />
           </CardAction>
         </CardHeader>
@@ -257,6 +267,9 @@ export default function CategoryComponent(props: CategoryComponentProps) {
             <TableHeader>
               <TableRow>
                 <TableHead>Name</TableHead>
+                <TableHead>Address</TableHead>
+                <TableHead>Phone Number</TableHead>
+                <TableHead>Active</TableHead>
                 <TableHead>Action</TableHead>
               </TableRow>
             </TableHeader>
@@ -267,6 +280,19 @@ export default function CategoryComponent(props: CategoryComponentProps) {
                 dataList.map((d, index) => (
                   <TableRow key={index}>
                     <TableCell>{ d.name }</TableCell>
+                    <TableCell>{ d.address }</TableCell>
+                    <TableCell>{ d.phone_number }</TableCell>
+                    <TableCell>
+                      {
+                        d.active == 1 ? 
+                        <>
+                          <Badge variant={ 'default' }>Active</Badge>
+                        </> : 
+                        <>
+                          <Badge variant={ 'destructive' }>Inactive</Badge>
+                        </>
+                      }
+                    </TableCell>
                     <TableCell>
                       <div className="flex flex-col md:flex-row gap-2">
 
@@ -280,12 +306,8 @@ export default function CategoryComponent(props: CategoryComponentProps) {
                             <SquarePen className="text-blue-500" />
                           </Button>
                         } form_content={
-                          <>
-                            <InputTextComponent nameElement="name" valueControl={ nameControl } onChangeControl={
-                              (val) => setNameControl(val)
-                            } label="Name">
-                            </InputTextComponent>
-                          </>
+                          <SupplierForms control={ formControl }
+                          setControl={ setFormControl } />
                         } isLoadingSubmit={ isLoadingSubmit } onSubmit={ updateData } />
 
 
@@ -293,8 +315,8 @@ export default function CategoryComponent(props: CategoryComponentProps) {
                         isLoadingSubmit={ isLoadingSubmit }
                           isOpen={ isOpenedDeleteDialog } 
                           setIsOpen={ setIsOpenedDeleteDialog }
-                          title="Delete Category Data"
-                          description="Are you sure want to delete this Category Data???" 
+                          title="Delete Supplier Data"
+                          description="Are you sure want to delete this Supplier Data???" 
                           onSubmit={
                             deleteData
                           }
@@ -318,14 +340,11 @@ export default function CategoryComponent(props: CategoryComponentProps) {
           {
             dataList.length == 0 ? 
             <NoDataAlertComponent 
-            title="No Category Data" 
-            description="No Category Data was Found"></NoDataAlertComponent>
+            title="No Supplier Data" description="No Supplier Data was Found"></NoDataAlertComponent>
             : <></>
           }
         </CardContent>
       </Card>
-
-
     </>
   )
 }

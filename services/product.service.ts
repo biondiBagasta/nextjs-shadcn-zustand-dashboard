@@ -1,20 +1,7 @@
-import { CategoryData } from "@/interfaces/category";
-import { ProductPaginate } from "@/interfaces/product";
+import { ProductBody, ProductPaginate } from "@/interfaces/product";
 import { ResponseMessage } from "@/interfaces/response-message";
 import { axiosClient, toObservable } from "@/lib/axios";
 import { Observable } from "rxjs";
-
-interface ProductBody {
-  code: string
-  name: string
-  purchase_price: number
-  selling_price: number
-  stock: number
-  discount?: number
-  category_id: number;
-  category: CategoryData;
-  image: string
-}
 
 export class ProductService {
   searchPaginate(page: number, term: string): Observable<ProductPaginate> {

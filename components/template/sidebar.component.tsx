@@ -1,7 +1,7 @@
 "use client"
 
 import SidebarMenuItemComponent from "./sidebar-menu-item.component"
-import { ChartColumn, Package, } from "lucide-react"
+import { ChartColumn, Package, PackagePlus, } from "lucide-react"
 
 interface SidebarProps {
   isOpenedSidebar: boolean
@@ -26,6 +26,10 @@ export default function SidebarComponent(props: SidebarProps) {
 
         <SidebarMenuItemComponent name="Products" redirectRoute="products" icon={
           <Package size={24} />
+        }/>
+        
+        <SidebarMenuItemComponent name="Restock" redirectRoute="restock" icon={
+          <PackagePlus size={24} />
         }/>
       </ul>
     </aside>

@@ -10,6 +10,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { Dispatch, ReactElement, SetStateAction } from "react";
+import { Spinner } from "../ui/spinner";
 
 interface DeleteAlertComponentProps {
   isOpen: boolean;
@@ -18,6 +19,7 @@ interface DeleteAlertComponentProps {
   description: string;
   onSubmit: () => void
   trigger: ReactElement
+  isLoadingSubmit: boolean
 }
 
 export function DeleteAlertComponent(props: DeleteAlertComponentProps) {
@@ -35,7 +37,12 @@ export function DeleteAlertComponent(props: DeleteAlertComponentProps) {
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel className="cursor-pointer">Cancel</AlertDialogCancel>
-          <AlertDialogAction  className="cursor-pointer" onClick={ props.onSubmit }>Continue</AlertDialogAction>
+          <AlertDialogAction  className="cursor-pointer" onClick={ props.onSubmit }>
+            {
+              props.isLoadingSubmit ? <Spinner data-icon="inline-start"></Spinner> : <></>
+            }
+            Continue
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

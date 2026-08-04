@@ -24,12 +24,13 @@ interface FormDialogComponentProps {
 
 export default function FormDialogComponent(props: FormDialogComponentProps) {
   return (
-    <Dialog open={ props.isOpen } onOpenChange={ props.setIsOpen }>
+    <Dialog open={ props.isOpen } onOpenChange={ props.setIsOpen } >
       <form>
         <DialogTrigger render={
           props.trigger
         } />
-        <DialogContent className="sm:max-w-sm">
+        <DialogContent className="sm:max-w-sm md:max-w-3xl"
+        >
           <DialogHeader>
             <DialogTitle>{ props.title }</DialogTitle>
           </DialogHeader>
@@ -40,7 +41,7 @@ export default function FormDialogComponent(props: FormDialogComponentProps) {
             <DialogClose render={
               <Button variant="outline" className="cursor-pointer">Cancel</Button>
             }/>
-            <Button type="submit" onClick={ props.onSubmit } className="cursor-pointerN">
+            <Button type="submit" onClick={ props.onSubmit } className="cursor-pointer">
               {
                 props.isLoadingSubmit ? <Spinner data-icon="inline-start"></Spinner> : <></>
               }
