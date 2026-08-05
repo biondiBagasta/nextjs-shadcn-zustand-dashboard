@@ -3,6 +3,7 @@ import { CategoryService } from "@/services/category.service";
 import { FilesService } from "@/services/files.service";
 import { ProductService } from "@/services/product.service";
 import { SupplierService } from "@/services/supplier.service";
+import { UserService } from "@/services/user.service";
 import { create } from "zustand";
 
 interface ServiceState {
@@ -11,6 +12,7 @@ interface ServiceState {
   productService: ProductService
   filesService: FilesService
   supplierService: SupplierService
+  userService: UserService
 }
 
 export const useServiceStore = create<ServiceState>(() => ({
@@ -18,5 +20,6 @@ export const useServiceStore = create<ServiceState>(() => ({
   categoryService: new CategoryService(),
   productService: new ProductService(),
   filesService: new FilesService(),
-  supplierService: new SupplierService()
+  supplierService: new SupplierService(),
+  userService: new UserService()
 }))

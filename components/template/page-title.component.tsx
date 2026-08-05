@@ -23,8 +23,12 @@ export default function PageTitleComponent(props: PageTitleProps) {
                 }
               }>{ props.subtitle }</Link>
             </li>
+            
           ) : (<></>)
         }
+        <li>
+					{ props.title }
+				</li>
       </ul>
     </div>
   )

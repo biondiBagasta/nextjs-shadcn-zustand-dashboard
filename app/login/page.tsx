@@ -3,10 +3,10 @@
 import { useEffect, useRef, useState } from "react";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { toast, Toast } from "@/components/ui/toast";
+import { toast, } from "@/components/ui/toast";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
-import { catchError, EMPTY, Subscription, switchMap, tap } from "rxjs";
+import { catchError, EMPTY, Subscription, tap } from "rxjs";
 import { useServiceStore } from "@/store/service.stroe";
 import { useAuthenticatedStore } from "@/store/authenticated.store";
 import { useRouter } from "next/navigation";
@@ -45,14 +45,14 @@ export default function LoginPage() {
   useEffect(() => {
 		const jwt = localStorage.getItem("jwt");
 
-		const currentSubscription = subscriptionRef.current;
+		subscriptionRef.current = new Subscription();
 
 		if(jwt) {
 			router.replace("/dashboard/main");
 		}
 
 		return () => {
-			currentSubscription.unsubscribe();
+			subscriptionRef.current.unsubscribe();
 		}
 	}, [router]);
 
@@ -91,19 +91,14 @@ export default function LoginPage() {
       setIsLoadingSubmit(true);
 
       const loginSubscription = authService.login(loginForm.username, loginForm.password).pipe(
-        switchMap((data) => {
+        tap((data) => {
           
+          window.localStorage.setItem("jwt", data.token)
 
-          localStorage.setItem("jwt", data.token)
+          setIsLoadingSubmit(false);
+          setAuthenticatedState(data);
 
-          return authService.authenticated().pipe(
-            tap(data => {
-              setIsLoadingSubmit(false);
-              setAuthenticatedState(data);
-
-              router.push("/dashboard/main")
-            })
-          )
+          router.push("/dashboard/main")
         }),
         catchError((e: AxiosError) => {
           setIsLoadingSubmit(false);

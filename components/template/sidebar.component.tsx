@@ -1,7 +1,7 @@
 "use client"
 
 import SidebarMenuItemComponent from "./sidebar-menu-item.component"
-import { ChartColumn, Package, PackagePlus, } from "lucide-react"
+import { ChartColumn, Package, PackagePlus, UserRound, } from "lucide-react"
 
 interface SidebarProps {
   isOpenedSidebar: boolean
@@ -22,6 +22,11 @@ export default function SidebarComponent(props: SidebarProps) {
         <SidebarMenuItemComponent name="Dashboard" redirectRoute="main"
         icon={
           <ChartColumn size={24} />
+        } />
+
+        <SidebarMenuItemComponent name="User" redirectRoute="user"
+        icon={
+          <UserRound size={24} />
         } />
 
         <SidebarMenuItemComponent name="Products" redirectRoute="products" icon={

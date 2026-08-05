@@ -1,5 +1,5 @@
 import { LoginResponse } from "@/interfaces/login-response";
-import { User } from "@/interfaces/user";
+import { UserData } from "@/interfaces/user";
 import { axiosClient, toObservable } from "@/lib/axios";
 import { defer, map, Observable } from "rxjs";
 
@@ -13,7 +13,7 @@ export class AuthService {
     })
   }
 
-  authenticated(): Observable<User> {
+  authenticated(): Observable<UserData> {
     return toObservable(() => {
       return axiosClient.post("/auth/authenticated")
     })

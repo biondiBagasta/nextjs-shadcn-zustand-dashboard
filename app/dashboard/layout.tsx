@@ -54,6 +54,7 @@ export default function DashboardLayout({
   }
 
   useEffect(() => {
+    subscriptionRef.current = new Subscription();
     checkAuthenticated();
 
     return () => {

@@ -298,7 +298,7 @@ export default function SupplierComponent(props: SupplierComponentProps) {
 
                         <FormDialogComponent isOpen={ isOpenedEditDialog } 
                         setIsOpen={ setIsOpenedEditDialog }
-                        title="Edit Category" trigger={
+                        title="Edit Supplier" trigger={
                           <Button variant={ 'outline' } size={ 'icon' } onClick={
                             (_) => updateFormAndSelectedData(d)
                           }
