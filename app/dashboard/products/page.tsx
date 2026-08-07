@@ -12,8 +12,6 @@ import { ProductData, ProductPaginate } from "@/interfaces/product"
 import { useServiceStore } from "@/store/service.stroe"
 import { AxiosError } from "axios"
 import { baseUrl, showHttpErrorToast } from "@/lib/axios"
-import { maskitoTransform } from "@maskito/core"
-import { maskitoCurrencyOptions, maskitoPercentOptions } from "@/lib/utils"
 import { toast } from "@/components/ui/toast"
 import { FileResponse } from "@/interfaces/file-response"
 import FormDialogComponent from "@/components/reuseable/form-dialog.component"
@@ -25,6 +23,7 @@ import { PaginationComponent } from "@/components/reuseable/pagination-component
 import DetailImageDialogComponent from "@/components/reuseable/detail-image-dialog-component"
 import ProductsForm from "./products.forms"
 import LoadingTableComponent from "@/components/reuseable/loading-table-component"
+import { deformatToNumber, formatCurrency, formatPercent } from "@/lib/utils"
 
 export interface ProductFormsControl {
   code: string;
@@ -73,41 +72,6 @@ export default function ProductPage() {
 
   const [currentPage, setCurrentPage] = useState(1);
 
-  useEffect(() => {
-    subscriptionRef.current = new Subscription();
-
-    searchPaginate();
-
-    return () => {
-      subscriptionRef.current.unsubscribe()
-    }
-  }, []);
-
-  // Debounce Effect
-  useEffect(() => {
-    // Set a timeout to update debounced value after 500ms
-    const handler = setTimeout(() => {
-      setDebounceSearch(searchControl);
-    }, 500);
-
-    // Cleanup the timeout if `query` changes before 500ms
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [searchControl]);
-
-  useEffect(() => {
-    searchPaginate();
-  }, [debounceSearch, currentPage]);
-
-  const checkFormValidity = () => {
-    const isValid = !Object.values(formControl).some(
-      (value) => value === "" || value === 0
-    );
-
-    return isValid;
-  }
-
   const resetFormControl = () => {
     setImageFileControl(null)
     setFormControl({
@@ -148,15 +112,50 @@ export default function ProductPage() {
     subscriptionRef.current.add(searchSubscription)
   }
 
+  useEffect(() => {
+    subscriptionRef.current = new Subscription();
+
+    searchPaginate();
+
+    return () => {
+      subscriptionRef.current.unsubscribe()
+    }
+  }, []);
+
+  // Debounce Effect
+  useEffect(() => {
+    // Set a timeout to update debounced value after 500ms
+    const handler = setTimeout(() => {
+      setDebounceSearch(searchControl);
+    }, 500);
+
+    // Cleanup the timeout if `query` changes before 500ms
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchControl]);
+
+  useEffect(() => {
+    searchPaginate();
+  }, [debounceSearch, currentPage]);
+
+  const checkFormValidity = () => {
+    const isValid = !Object.values(formControl).some(
+      (value) => value === "" || value === 0
+    );
+
+    return isValid;
+  }
+
   const updateFormAndSelectedData = (data: ProductData) => {
     setFormControl({
       code: data.code,
       name: data.name,
       description: data.description,
-      purchase_price: maskitoTransform(data.purchase_price.toString(), maskitoCurrencyOptions),
-      selling_price: maskitoTransform(data.selling_price.toString(), maskitoCurrencyOptions),
+      purchase_price: formatCurrency(data.purchase_price),
+      selling_price: formatCurrency(data.selling_price),
       stock: data.stock.toString(),
-      discount: (maskitoTransform(data.discount.toString(), maskitoPercentOptions)),
+      discount: formatPercent(data.discount),
       category_id: data.category_id,
     })
     setSelectedData(data);
@@ -170,9 +169,9 @@ export default function ProductPage() {
 
   		formData.append("product_image", imageFileControl!);
       
-      const purchase_price = Number(formControl.purchase_price.replaceAll(/[^0-9]/g, ""));
-  		const selling_price = Number(formControl.selling_price.replaceAll(/[^0-9]/g, ""));
-  		const discount = Number(formControl.discount.replaceAll(/[^0-9]/g, ""));
+      const purchase_price = deformatToNumber(formControl.purchase_price);
+  		const selling_price = deformatToNumber(formControl.selling_price);
+  		const discount = deformatToNumber(formControl.discount);
 
       const createSubscription = fileService.uploadProductImage(formData).pipe(
         switchMap((fileResponse) => {
@@ -256,9 +255,9 @@ export default function ProductPage() {
         file_extension: ""
       })
       
-      const purchase_price = Number(formControl.purchase_price.replaceAll(/[^0-9]/g, ""));
-  		const selling_price = Number(formControl.selling_price.replaceAll(/[^0-9]/g, ""));
-  		const discount = Number(formControl.discount.replaceAll(/[^0-9]/g, ""));
+      const purchase_price = deformatToNumber(formControl.purchase_price);
+  		const selling_price = deformatToNumber(formControl.selling_price);
+  		const discount = deformatToNumber(formControl.discount);
 
       const updateSubscription = uploadFileObs.pipe(
         switchMap((fileResponse) => {
@@ -378,6 +377,7 @@ export default function ProductPage() {
               <CardContent>
                 <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-5">
                   <FormDialogComponent isOpen={ isOpenedCreateDialog } setIsOpen={ setIsOpenedCreateDialog }
+                    size="l"
                   title="Add Product" trigger={
                     <Button variant={'default'} size={'lg'} className="cursor-pointer" onClick={
                       (_) => resetFormControl()
@@ -431,14 +431,15 @@ export default function ProductPage() {
                           <TableCell>{ d.name }</TableCell>
                           <TableCell>{ d.edges.category.name }</TableCell>
                           <TableCell dangerouslySetInnerHTML={{ __html: d.description }}></TableCell>
-                          <TableCell>{ maskitoTransform(d.purchase_price.toString(), maskitoCurrencyOptions) }</TableCell>
-                          <TableCell>{ maskitoTransform(d.selling_price.toString(), maskitoCurrencyOptions) }</TableCell>
+                          <TableCell>{ formatCurrency(d.purchase_price) }</TableCell>
+                          <TableCell>{ formatCurrency(d.selling_price) }</TableCell>
                           <TableCell>{ d.discount }%</TableCell>
                           <TableCell>{ d.stock }</TableCell>
                           <TableCell>
                             <div className="flex flex-col md:flex-row gap-2">
 
                               <FormDialogComponent isOpen={ isOpenedEditDialog } 
+                                size="l"
                               setIsOpen={ setIsOpenedEditDialog }
                               title="Edit Product" trigger={
                                 <Button variant={ 'outline' } size={ 'icon' } onClick={

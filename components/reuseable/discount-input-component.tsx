@@ -22,7 +22,18 @@ export default function DiscountInputComponent(props: DiscountInputComponentProp
         props.valueControl
       } onChange={
         (e) => {
-          const formattedData = maskitoTransform(e.target.value, maskitoPercentOptions);
+          const value = e.target.value
+
+          if (value === "") {
+            props.onChangeControl("")
+            return
+          }
+
+          const formattedData = maskitoTransform(
+            value,
+            maskitoPercentOptions
+          )
+
           props.onChangeControl(formattedData)
         }
       }></Input>

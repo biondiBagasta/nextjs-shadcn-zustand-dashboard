@@ -235,6 +235,7 @@ export default function CategoryComponent(props: CategoryComponentProps) {
           <CardTitle>Data Product Category</CardTitle>
           <CardAction>
             <FormDialogComponent isOpen={ isOpenedCreateDialog } setIsOpen={ setIsOpenedCreateDialog }
+              size="n"
             title="Add Category" trigger={
               <Button variant={'default'} size={'lg'} className="cursor-pointer" onClick={
                 (_) => resetFormControl()
@@ -271,6 +272,7 @@ export default function CategoryComponent(props: CategoryComponentProps) {
                       <div className="flex flex-col md:flex-row gap-2">
 
                         <FormDialogComponent isOpen={ isOpenedEditDialog } 
+                          size="n"
                         setIsOpen={ setIsOpenedEditDialog }
                         title="Edit Category" trigger={
                           <Button variant={ 'outline' } size={ 'icon' } onClick={

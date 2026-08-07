@@ -20,31 +20,49 @@ interface FormDialogComponentProps {
   form_content: React.ReactNode;
   isLoadingSubmit: boolean;
   onSubmit: () => void;
+  size: "n" | "l"
 }
 
 export default function FormDialogComponent(props: FormDialogComponentProps) {
   return (
-    <Dialog open={ props.isOpen } onOpenChange={ props.setIsOpen } >
+    <Dialog open={props.isOpen} onOpenChange={props.setIsOpen}>
       <form>
-        <DialogTrigger render={
-          props.trigger
-        } />
-        <DialogContent className="sm:max-w-sm md:max-w-3xl"
+        <DialogTrigger render={props.trigger} />
+
+        <DialogContent
+          className={
+            props.size === "l"
+              ? "sm:max-w-full md:max-w-5xl max-h-[90vh] flex flex-col overflow-hidden"
+              : "sm:max-w-full md:max-w-2xl max-h-[90vh] flex flex-col overflow-hidden"
+          }
         >
-          <DialogHeader>
-            <DialogTitle>{ props.title }</DialogTitle>
+          <DialogHeader className="shrink-0">
+            <DialogTitle>{props.title}</DialogTitle>
           </DialogHeader>
-          <FieldGroup>
-            { props.form_content }
-          </FieldGroup>
-          <DialogFooter>
-            <DialogClose render={
-              <Button variant="outline" className="cursor-pointer">Cancel</Button>
-            }/>
-            <Button type="submit" onClick={ props.onSubmit } className="cursor-pointer">
-              {
-                props.isLoadingSubmit ? <Spinner data-icon="inline-start"></Spinner> : <></>
+
+          <div className="flex-1 min-h-0 overflow-y-auto pr-2">
+            <FieldGroup>
+              {props.form_content}
+            </FieldGroup>
+          </div>
+
+          <DialogFooter className="shrink-0">
+            <DialogClose
+              render={
+                <Button variant="outline" className="cursor-pointer">
+                  Cancel
+                </Button>
               }
+            />
+
+            <Button
+              type="submit"
+              onClick={props.onSubmit}
+              className="cursor-pointer"
+            >
+              {props.isLoadingSubmit ? (
+                <Spinner data-icon="inline-start" />
+              ) : null}
               Submit
             </Button>
           </DialogFooter>

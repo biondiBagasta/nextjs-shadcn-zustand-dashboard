@@ -13,6 +13,15 @@ export class ProductService {
     })
   }
 
+  searchPaginateLimitFive(page: number, term: string): Observable<ProductPaginate> {
+    return toObservable(() => {
+      return axiosClient.post<ProductPaginate>(`/product/search-paginate-limit-five`, {
+        page,
+        term
+      })
+    })
+  }
+
   create(body: ProductBody): Observable<ResponseMessage> {
     return toObservable(() => {
       return axiosClient.post<ResponseMessage>(`/product/create`, body)

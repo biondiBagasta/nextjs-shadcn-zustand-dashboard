@@ -250,6 +250,7 @@ export default function SupplierComponent(props: SupplierComponentProps) {
           <CardTitle>Data Supplier</CardTitle>
           <CardAction>
             <FormDialogComponent isOpen={ isOpenedCreateDialog } setIsOpen={ setIsOpenedCreateDialog }
+              size="n"
             title="Add Supplier" trigger={
               <Button variant={'default'} size={'lg'} className="cursor-pointer" onClick={
                 (_) => resetFormControl()
@@ -297,6 +298,7 @@ export default function SupplierComponent(props: SupplierComponentProps) {
                       <div className="flex flex-col md:flex-row gap-2">
 
                         <FormDialogComponent isOpen={ isOpenedEditDialog } 
+                          size="n"
                         setIsOpen={ setIsOpenedEditDialog }
                         title="Edit Supplier" trigger={
                           <Button variant={ 'outline' } size={ 'icon' } onClick={
